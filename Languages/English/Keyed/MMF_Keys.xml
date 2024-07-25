@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<MMF.CurrentMapMode>Current Map Mode</MMF.CurrentMapMode>
+	
+	<MMF.DrawSettings>Draw Settings</MMF.DrawSettings>
+	<MMF.DrawSettings.IncludeWater>Include Water</MMF.DrawSettings.IncludeWater>
+	<MMF.DrawSettings.Opacity>Opacity</MMF.DrawSettings.Opacity>
+	<MMF.DrawSettings.DrawWorldObjects>Draw World Objects</MMF.DrawSettings.DrawWorldObjects>
+	<MMF.DrawSettings.DrawHills>Draw Hills</MMF.DrawSettings.DrawHills>
+	<MMF.DrawSettings.DrawRivers>Draw Rivers</MMF.DrawSettings.DrawRivers>
+	<MMF.DrawSettings.DrawRoads>Draw Roads</MMF.DrawSettings.DrawRoads>
+	<MMF.DrawSettings.DrawPollution>Draw Pollution</MMF.DrawSettings.DrawPollution>
+	<MMF.DrawSettings.DisableFeaturesText>Disable Features Text</MMF.DrawSettings.DisableFeaturesText>
+	<MMF.DrawSettings.DisplayLabels>Display Labels</MMF.DrawSettings.DisplayLabels>
+	<MMF.DrawSettings.DoTooltip>Do Tooltip</MMF.DrawSettings.DoTooltip>
+	
+	<MMF.Type>Type</MMF.Type>
+	
+	<MMF.WorldFeatures.Island>Island</MMF.WorldFeatures.Island>
+	<MMF.WorldFeatures.Archipelago>Archipelago</MMF.WorldFeatures.Archipelago>
+	<MMF.WorldFeatures.Peninsula>Peninsula</MMF.WorldFeatures.Peninsula>
+	<MMF.WorldFeatures.Bay>Bay</MMF.WorldFeatures.Bay>
+	<MMF.WorldFeatures.Lake>Lake</MMF.WorldFeatures.Lake>
+	<MMF.WorldFeatures.Sea>Sea</MMF.WorldFeatures.Sea>
+	<MMF.WorldFeatures.OceanBay>Ocean Bay</MMF.WorldFeatures.OceanBay>
+	<MMF.WorldFeatures.Ocean>Ocean</MMF.WorldFeatures.Ocean>
+	<MMF.WorldFeatures.OuterOcean>Outer Ocean</MMF.WorldFeatures.OuterOcean>
+	<MMF.WorldFeatures.MountainRange>Mountain Range</MMF.WorldFeatures.MountainRange>
+	<MMF.WorldFeatures.Desert>Desert</MMF.WorldFeatures.Desert>
+	<MMF.WorldFeatures.TemperateSwamp>Temperate Swamp</MMF.WorldFeatures.TemperateSwamp>
+	<MMF.WorldFeatures.TropicalSwamp>Tropical Swamp</MMF.WorldFeatures.TropicalSwamp>
+	<MMF.WorldFeatures.ColdBog>Cold Bog</MMF.WorldFeatures.ColdBog>
+	<MMF.WorldFeatures.TemperateForest>Temperate Forest</MMF.WorldFeatures.TemperateForest>
+	<MMF.WorldFeatures.TropicalRainforest>Tropical Rainforest</MMF.WorldFeatures.TropicalRainforest>
+	<MMF.WorldFeatures.BorealForest>Boreal Forest</MMF.WorldFeatures.BorealForest>
+	<MMF.WorldFeatures.AridShrubland>Arid Shrubland</MMF.WorldFeatures.AridShrubland>
+	<MMF.WorldFeatures.IceSheet>Ice Sheet</MMF.WorldFeatures.IceSheet>
+	<MMF.WorldFeatures.Tundra>Tundra</MMF.WorldFeatures.Tundra>
+</LanguageData>

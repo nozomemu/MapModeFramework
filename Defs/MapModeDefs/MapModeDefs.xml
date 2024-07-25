@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	
+	<MapModeFramework.MapModeDef>
+		<defName>Default</defName>
+		<label>Default</label>
+		<iconPath>UI/MapModes/Default</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef Name="MapMode_Terrain" Abstract="True">
+		<mapModeClass>MapModeFramework.MapMode_Terrain</mapModeClass>
+		<worldLayerClass>MapModeFramework.WorldLayer_MapMode_Terrain</worldLayerClass>
+		<drawWorldObjects>false</drawWorldObjects>
+		<drawHills>false</drawHills>
+		<drawRivers>true</drawRivers>
+		<drawRoads>false</drawRoads>
+		<drawPollution>false</drawPollution>
+		<disableFeaturesText>true</disableFeaturesText>
+		<displayLabels>true</displayLabels>
+		<doTooltip>true</doTooltip>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<mapModeClass>MapModeFramework.MapMode_Biome</mapModeClass>
+		<defName>Biome</defName>
+		<label>Biome</label>
+		<displayLabels>false</displayLabels>
+		<doTooltip>false</doTooltip>
+		
+		<iconPath>UI/MapModes/Biome</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>Temperature</defName>
+		<label>Temperature</label>
+		<iconPath>UI/MapModes/Temperature</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>Elevation</defName>
+		<label>Elevation</label>
+		<iconPath>UI/MapModes/Elevation</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>Rainfall</defName>
+		<label>Rainfall</label>
+		<iconPath>UI/MapModes/Rainfall</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef>
+		<mapModeClass>MapModeFramework.MapMode_Features</mapModeClass>
+		<worldLayerClass>MapModeFramework.WorldLayer_MapMode_Region</worldLayerClass>
+		<defName>Features</defName>
+		<label>Features</label>
+		
+		<drawWorldObjects>true</drawWorldObjects>
+		<drawHills>true</drawHills>
+		<drawRivers>true</drawRivers>
+		<drawRoads>true</drawRoads>
+		<drawPollution>true</drawPollution>
+		<disableFeaturesText>false</disableFeaturesText>
+		<doTooltip>true</doTooltip>
+		
+		<iconPath>UI/MapModes/Features</iconPath>
+		<RegionProperties>
+			<overrideSelector>true</overrideSelector>
+			<cacheOnLoad>true</cacheOnLoad> <!--Try to cache upon loading the game since outlines/borders are the bottleneck, especially on higher world coverages and vast regions-->
+			<doBorders>true</doBorders>
+			<borderWidth>0.5</borderWidth>
+		</RegionProperties>
+	</MapModeFramework.MapModeDef>
+	
+</Defs>
