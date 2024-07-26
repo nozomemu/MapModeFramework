@@ -19,5 +19,11 @@ namespace MapModeFramework
         {
             cachedRegions.Add(key, region);
         }
+
+        public static void RemoveRegion(T key)
+        {
+            cachedRegions.Remove(key);
+            MapModeComponent.Instance.Notify_RegionChanged();
+        }
     }
 }

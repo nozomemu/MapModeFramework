@@ -132,12 +132,12 @@ namespace MapModeFramework
                 {
                     expandedHeight += height;
                 }
-                UpdateWindowSize();
             }
             else
             {
                 drawSettingsHeight = 0f;
             }
+            UpdateWindowSize();
             ref bool toExpand = ref drawSettings ? ref drawSettingsExpanded : ref windowExpanded;
             Widgets.CheckboxLabeled(inRect, label, ref toExpand, placeCheckboxNearText: !drawSettings, texChecked: Resources.dropdownExpanded, texUnchecked: Resources.dropdown);
             if (drawSettings)

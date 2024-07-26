@@ -75,6 +75,7 @@ namespace MapModeFramework
 
         public override void SetRegions()
         {
+            regions.Clear();
             foreach (T regionType in RegionList)
             {
                 Region region = GetOrGenerateRegion(regionType);

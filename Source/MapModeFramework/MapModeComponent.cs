@@ -145,5 +145,14 @@ namespace MapModeFramework
             drawSettings.Reset();
             regenerateNow = false;
         }
+
+        public void Notify_RegionChanged()
+        {
+            if (currentMapMode is MapMode_Region mapModeRegion)
+            {
+                mapModeRegion.DoPreRegenerate();
+                regenerateNow = true;
+            }
+        }
     }
 }
