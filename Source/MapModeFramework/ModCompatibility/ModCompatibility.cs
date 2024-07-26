@@ -72,7 +72,8 @@ namespace MapModeFramework
             Assembly assembly = assemblies.FirstOrDefault(x => x.GetName().Name.Contains(assemblyName));
             if (assembly == null)
             {
-                Core.Error($"Assembly named {assemblyName} not found. Render patch not applied.");
+                Core.Warning($"Assembly named {assemblyName} not found. Render patch not applied.");
+                return;
             }
             Type worldLayer = assembly.GetTypes().FirstOrDefault(x => x.FullName.Contains(worldLayerName));
             if (worldLayer != null)
