@@ -103,5 +103,9 @@ namespace MapModeFramework
         public  virtual void MapModeOnGUI()
         {
         }
+
+        public virtual Material GetMaterial(int tile) => BaseContent.ClearMat;
+        public virtual string GetTileLabel(int tile) => string.Empty;
+        public virtual string GetTooltip(int tile) => string.Empty;
     }
 }

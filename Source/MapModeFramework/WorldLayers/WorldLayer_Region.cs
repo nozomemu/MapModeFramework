@@ -160,29 +160,5 @@ namespace MapModeFramework
                 subMesh.tris.Add(count + 3);
             }
         }
-
-        public override Material GetMaterial(int tile)
-        {
-            Region region = Regions.FirstOrDefault(x => x.tiles.Contains(tile));
-            if (region == null)
-            {
-                return BaseContent.ClearMat;
-            }
-            return region.material;
-        }
-
-        public override string GetTooltip(int tile)
-        {
-            Region region = Regions.FirstOrDefault(x => x.tiles.Contains(tile));
-            if (region == null)
-            {
-                return base.GetTooltip(tile);
-            }
-            if (!ModCompatibility.OverrideTooltip(tile, out string tooltip))
-            {
-                tooltip = region.GetTooltip();
-            }
-            return tooltip;
-        }
     }
 }

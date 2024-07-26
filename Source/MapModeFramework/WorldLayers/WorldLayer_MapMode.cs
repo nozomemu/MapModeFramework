@@ -39,13 +39,14 @@ namespace MapModeFramework
             Vector2 screenPos = GenWorldUI.WorldToUIPosition(Find.WorldGrid.GetTileCenter(mouseTile)); ;
             Rect rect = new Rect(screenPos.x - 40f, screenPos.y - 40f, 80f, 80f);
             string tileLabel = GetTileLabel(mouseTile);
-            if (MapModeComponent.drawSettings.displayLabels && !tileLabel.NullOrEmpty())
+            DrawSettings drawSettings = MapModeComponent.drawSettings;
+            if (drawSettings.displayLabels && !tileLabel.NullOrEmpty())
             {
                 Widgets.Label(rect, tileLabel);
             }
             Text.Anchor = TextAnchor.UpperLeft;
             string tileTooltip = GetTooltip(mouseTile);
-            if (MapModeComponent.drawSettings.doTooltip && !tileTooltip.NullOrEmpty())
+            if (drawSettings.doTooltip && !tileTooltip.NullOrEmpty())
             {
                 TipSignal tip = new TipSignal(() => tileTooltip, mouseTile);
                 TooltipHandler.TipRegion(rect, tip);
@@ -91,19 +92,24 @@ namespace MapModeFramework
             }
         }
 
-        public virtual Material GetMaterial(int tile)
-        {
-            return null;
-        }
+        public virtual Material GetMaterial(int tile) => CurrentMapMode.GetMaterial(tile);
 
         public virtual string GetTileLabel(int tile)
         {
-            return string.Empty;
+            if (ModCompatibility.OverrideLabel(tile, out string label))
+            {
+                return label;
+            }
+            return CurrentMapMode.GetTileLabel(tile);
         }
 
         public virtual string GetTooltip(int tile)
         {
-            return string.Empty;
+            if (ModCompatibility.OverrideTooltip(tile, out string tooltip))
+            {
+                return tooltip;
+            }
+            return CurrentMapMode.GetTooltip(tile);
         }
     }
 }

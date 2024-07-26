@@ -40,6 +40,30 @@ namespace MapModeFramework
         }
 
         public abstract void SetRegions();
+
+        public override Material GetMaterial(int tile)
+        {
+            Region region = GetRegion(tile);
+            if (region != null)
+            {
+                return region.material;
+            }
+            return base.GetMaterial(tile);
+        }
+
+        public override string GetTooltip(int tile)
+        {
+            Region region = GetRegion(tile);
+            if (region == null)
+            {
+                return base.GetTooltip(tile);
+            }
+            if (!ModCompatibility.OverrideTooltip(tile, out string tooltip))
+            {
+                tooltip = region.GetTooltip();
+            }
+            return tooltip;
+        }
     }
 
     public abstract class MapMode_GenericRegion<T> : MapMode_Region
