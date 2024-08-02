@@ -31,6 +31,7 @@ namespace MapModeFramework
             {
                 settings.InitializeSettings();
                 CacheRelevantLists();
+                ModCompatibility.GetAssemblies();
             });
         }
 

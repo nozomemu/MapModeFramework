@@ -24,7 +24,6 @@ namespace MapModeFramework
                 { "m00nl1ght.geologicallandforms", "GeologicalLandforms" }
             };
             assemblies = new List<Assembly>();
-            GetAssemblies();
         }
 
         public static void GetAssemblies()
