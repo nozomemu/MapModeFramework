@@ -8,26 +8,26 @@ namespace MapModeFramework
 {
     public static class TileUtilities
     {
-        static WorldGrid grid => Find.WorldGrid;
+        private static WorldGrid Grid => Find.WorldGrid;
 
         public static List<int> GetTileNeighbors(int tile)
         {
             List<int> neighbors = new List<int>();
-            grid.GetTileNeighbors(tile, neighbors);
+            Grid.GetTileNeighbors(tile, neighbors);
             return neighbors;
         }
 
         public static List<Vector3> GetTileVertices(int tile)
         {
             List<Vector3> vertices = new List<Vector3>();
-            grid.GetTileVertices(tile, vertices);
+            Grid.GetTileVertices(tile, vertices);
             return vertices;
         }
 
         public static List<int> GetTileIndices(int tile)
         {
             List<int> indices = new List<int>();
-            grid.GetTileVerticesIndices(tile, indices);
+            Grid.GetTileVerticesIndices(tile, indices);
             return indices;
         }
 

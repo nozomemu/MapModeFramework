@@ -1,19 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using UnityEngine;
+using UnityStandardAssets.ImageEffects;
 using Verse;
+using Verse.Noise;
 
 namespace MapModeFramework
 {
-    public abstract class MapMode_Region : MapMode
+    public abstract class MapMode_Region : MapMode_Cached
     {
-        public new WorldLayer_MapMode_Region WorldLayer => WorldLayer_MapMode_Region.Instance;
+        public override WorldLayer_MapMode WorldLayer => WorldLayer_MapMode_Region.Instance;
+        public WorldLayer_MapMode_Region WorldLayerRegion => (WorldLayer_MapMode_Region)WorldLayer;
+
         public List<Region> regions = new List<Region>();
         public abstract Material RegionMaterial { get; }
         public virtual bool DoBorders => def.RegionProperties.doBorders;
         public virtual Material BorderMaterial { get; }
         public virtual float BorderWidth => def.RegionProperties.borderWidth;
-        public bool cached;
 
         public MapMode_Region() { }
         public MapMode_Region(MapModeDef def) : base(def) { }
@@ -23,15 +30,58 @@ namespace MapModeFramework
             SetRegions();
         }
 
+        protected override void StartCaching(CancellationToken token)
+        {
+            regions.ForEach(region =>
+            {
+                if (region.doBorders && region.borderMaterial != BaseContent.ClearMat)
+                {
+                    tilesToCache += region.GetBorders().Count;
+                }
+            });
+            int regionsCount = regions.Count;
+            for (int i = 0; i < regionsCount; i++)
+            {
+                token.ThrowIfCancellationRequested();
+                Region region = regions[i];
+                WorldLayerRegion.DoRegionBorders(region, null, this);
+            }
+        }
+
+        protected override void DoCacheClearing()
+        {
+            Type genericType = GetType();
+            Type[] typeArgs = genericType.GetGenericArguments();
+            if (typeArgs.Length > 0)
+            {
+                Type cacheType = typeof(RegionCache<>).MakeGenericType(typeArgs[0]);
+                MethodInfo removeMethod = cacheType.GetMethod("RemoveRegion", BindingFlags.Public | BindingFlags.Static);
+
+                PropertyInfo listProperty = genericType.GetProperty("RegionList");
+                if (listProperty.GetValue(this) is IEnumerable list && removeMethod != null)
+                {
+                    foreach (var item in list)
+                    {
+                        //Debug message, removed once this works
+                        Core.Message($"Removed {item}");
+                        removeMethod.Invoke(null, new[] { item });
+                    }
+                }
+            }
+
+            List<Region> regions = this.regions;
+            int regionsCount = regions.Count;
+            for (int i = 0; i < regionsCount; i++)
+            {
+                Region region = regions[i];
+                EdgesCache.ClearRegionCache(region);
+            }
+        }
+
         public override void DoPreRegenerate()
         {
             base.DoPreRegenerate();
             SetRegions();
-        }
-
-        public override void MapModeOnGUI()
-        {
-            WorldLayer.OnGUI();
         }
 
         public Region GetRegion(int tile)
@@ -91,7 +141,10 @@ namespace MapModeFramework
                 if (region == null)
                 {
                     region = GenerateRegion(regionType);
-                    RegionCache<T>.AddRegion(regionType, region);
+                    if (EnabledCaching)
+                    {
+                        RegionCache<T>.AddRegion(regionType, region);
+                    }
                 }
                 return region;
             }

@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -11,7 +12,7 @@ namespace MapModeFramework
 
         protected Region lastDrawnRegion = null;
         protected abstract Region Region { get; }
-        public override bool Active => base.CurrentMapMode is MapMode_Region && CurrentMapMode?.WorldLayerClass == typeof(WorldLayer_MapMode_Region);
+        public override bool Active => base.CurrentMapMode is MapMode_Region && CurrentMapMode.WorldLayer.Regenerated;
         public override bool ShouldRegenerate
         {
             get
@@ -23,8 +24,25 @@ namespace MapModeFramework
                 return true;
             }
         }
+        protected override bool RegenerateAsynchronously => false;
 
-        public override void DoMeshes()
+        public override IEnumerable Regenerate()
+        {
+            foreach (object item in base.Regenerate())
+            {
+                yield return item;
+            }
+            if (!Active)
+            {
+                yield break;
+            }
+            DrawSelectorTiles();
+            FinalizeMesh(MeshParts.All);
+            MapModeComponent.Notify_RegenerationComplete(null);
+        }
+
+        //Relatively straightforward, no need to prepare asynchronously (though it does still lag when hovering over/selecting large regions, e.g. oceans)
+        public void DrawSelectorTiles()
         {
             if (Region == null)
             {

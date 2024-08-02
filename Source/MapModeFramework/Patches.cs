@@ -4,9 +4,34 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using Verse.Sound;
+using Verse.Profile;
+using System.Threading;
+using System.Linq;
 
 namespace MapModeFramework
 {
+    [HarmonyPatch(typeof(MemoryUtility), nameof(MemoryUtility.ClearAllMapsAndWorld))]
+    public static class MemoryUtility_ClearAllMapsAndWorld_Patch
+    {
+        public static async void Prefix()
+        {
+            await Core.KillAllAsyncProcesses();
+        }
+    }
+
+    [HarmonyPatch(typeof(Page), "DoBack")]
+    public static class Page_DoBack_Patch
+    {
+        public static async void Prefix(Page __instance)
+        {
+            if (!(__instance is Page_SelectStartingSite))
+            {
+                return;
+            }
+            await Core.KillAllAsyncProcesses();
+        }
+    }
+
     [HarmonyPatch(typeof(WorldSelector), "SelectUnderMouse")]
     public static class WorldSelector_SelectUnderMouse_Patch
     {

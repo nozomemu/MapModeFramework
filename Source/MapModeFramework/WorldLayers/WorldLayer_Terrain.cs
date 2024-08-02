@@ -1,9 +1,4 @@
-﻿using RimWorld;
-using RimWorld.Planet;
-using UnityEngine;
-using Verse;
-
-namespace MapModeFramework
+﻿namespace MapModeFramework
 {
     public class WorldLayer_MapMode_Terrain : WorldLayer_MapMode
     {

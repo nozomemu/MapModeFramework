@@ -2,8 +2,17 @@
 <Defs>
 	
 	<MapModeFramework.MapModeDef>
+		<mapModeClass>MapModeFramework.MapMode_Default</mapModeClass>
 		<defName>Default</defName>
 		<label>Default</label>
+		
+		<drawWorldObjects>true</drawWorldObjects>
+		<drawHills>true</drawHills>
+		<drawRivers>true</drawRivers>
+		<drawRoads>true</drawRoads>
+		<drawPollution>true</drawPollution>
+		<disableFeaturesText>false</disableFeaturesText>
+		
 		<iconPath>UI/MapModes/Default</iconPath>
 	</MapModeFramework.MapModeDef>
 	
@@ -24,6 +33,7 @@
 		<mapModeClass>MapModeFramework.MapMode_Biome</mapModeClass>
 		<defName>Biome</defName>
 		<label>Biome</label>
+		
 		<displayLabels>false</displayLabels>
 		<doTooltip>false</doTooltip>
 		
@@ -48,11 +58,50 @@
 		<iconPath>UI/MapModes/Rainfall</iconPath>
 	</MapModeFramework.MapModeDef>
 	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<mapModeClass>MapModeFramework.MapMode_GrowingPeriod</mapModeClass>
+		<defName>GrowingPeriod</defName>
+		<label>Growing Period</label>
+		<canCache>true</canCache>
+		
+		<displayLabels>false</displayLabels>
+		<doTooltip>true</doTooltip>
+		
+		<iconPath>UI/MapModes/GrowingPeriod</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<mapModeClass>MapModeFramework.MapMode_AnimalCommonality</mapModeClass>
+		<defName>AnimalCommonality</defName>
+		<label>Animal Commonality</label>
+		
+		<iconPath>UI/MapModes/AnimalCommonality</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<mapModeClass>MapModeFramework.MapMode_PlantCommonality</mapModeClass>
+		<defName>PlantCommonality</defName>
+		<label>Plant Commonality</label>
+		
+		<iconPath>UI/MapModes/PlantCommonality</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<!--
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<mapModeClass>MapModeFramework.MapMode_RockTypes</mapModeClass>
+		<defName>RockTypes</defName>
+		<label>Rock Types</label>
+		
+		<iconPath>UI/MapModes/RockTypes</iconPath>
+	</MapModeFramework.MapModeDef>
+	-->
+	
 	<MapModeFramework.MapModeDef>
 		<mapModeClass>MapModeFramework.MapMode_Features</mapModeClass>
 		<worldLayerClass>MapModeFramework.WorldLayer_MapMode_Region</worldLayerClass>
 		<defName>Features</defName>
 		<label>Features</label>
+		<canCache>true</canCache>
 		
 		<drawWorldObjects>true</drawWorldObjects>
 		<drawHills>true</drawHills>
@@ -65,7 +114,6 @@
 		<iconPath>UI/MapModes/Features</iconPath>
 		<RegionProperties>
 			<overrideSelector>true</overrideSelector>
-			<cacheOnLoad>true</cacheOnLoad> <!--Try to cache upon loading the game since outlines/borders are the bottleneck, especially on higher world coverages and vast regions-->
 			<doBorders>true</doBorders>
 			<borderWidth>0.5</borderWidth>
 		</RegionProperties>

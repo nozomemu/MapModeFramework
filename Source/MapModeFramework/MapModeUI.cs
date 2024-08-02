@@ -14,12 +14,22 @@ namespace MapModeFramework
         public MapMode CurrentMapMode => parent.currentMapMode;
 
         public override Vector2 InitialSize => new Vector2(curBaseX + Margin * 2f, curBaseY + Margin * 2f);
-        private const float barWidth = 400f;
+        private const float barWidth = 408f;
         private const float barHeight = 48f;
-        float curBaseX;
-        float curBaseY;
+        private float curBaseX;
+        private float curBaseY;
 
-        int currentMapModeIndex;
+        private const float buttonSize = 32f;
+        private const float buttonMargin = 8f;
+        private const int MaxButtonsOnBar = (int)(barWidth / (buttonSize + buttonMargin));
+        private int currentMapModeIndex;
+
+        private readonly int[] mapModeBar = new int[MaxButtonsOnBar];
+
+        private float timeToSwitch;
+        private int activeMapModeButtonControl;
+        private Vector3 activeMapModeButtonControlMouseStart;
+        private MapMode draggedMapMode;
 
         float expandedHeight;
         bool windowExpanded;
@@ -36,6 +46,7 @@ namespace MapModeFramework
             closeOnClickedOutside = false;
             preventCameraMotion = false;
             doWindowBackground = false;
+            draggable = true;
             drawShadow = false;
         }
 
@@ -57,6 +68,12 @@ namespace MapModeFramework
             windowRect = windowRect.Rounded();
         }
 
+        private void BindWindowPosition()
+        {
+            windowRect.x = Mathf.Clamp(windowRect.x, 0f, UI.screenWidth - windowRect.width);
+            windowRect.y = Mathf.Clamp(windowRect.y, 0f, UI.screenHeight - windowRect.height);
+        }
+
         public override void WindowUpdate()
         {
             if (!WorldRendererUtility.WorldRenderedNow)
@@ -65,6 +82,95 @@ namespace MapModeFramework
                 return;
             }
             base.WindowUpdate();
+            if (timeToSwitch > 0)
+            {
+                timeToSwitch -= Time.deltaTime;
+                if (timeToSwitch < 0)
+                {
+                    timeToSwitch = 0;
+                }
+            }
+        }
+
+        public override void WindowOnGUI()
+        {
+            BindWindowPosition();
+            base.WindowOnGUI();
+        }
+
+        protected override void LateWindowOnGUI(Rect inRect)
+        {
+            base.LateWindowOnGUI(inRect);
+            DoMapModeDragger();
+            DrawDraggedMapMode();
+        }
+
+        private bool InBounds()
+        {
+            bool windowInBoundsX = UI.MousePositionOnUI.x >= windowRect.x && UI.MousePositionOnUI.x < windowRect.xMax;
+            bool windowInBoundsY = UI.MousePositionOnUIInverted.y >= windowRect.y && UI.MousePositionOnUIInverted.y < windowRect.yMax;
+            return windowInBoundsX && windowInBoundsY;
+        }
+
+        private void DoMapModeDragger()
+        {
+            if (draggedMapMode == null)
+            {
+                return;
+            }
+            int currentIndex = MapModes.IndexOf(draggedMapMode);
+            if (Input.GetMouseButtonUp(0) || !InBounds())
+            {
+                Rect rect = windowRect.AtZero().ContractedBy(Margin);
+                Rect rectCurrentMapMode = new Rect(rect) { height = Text.LineHeight };
+                Rect rectMapModeBar = new Rect(rectCurrentMapMode) { y = rectCurrentMapMode.yMax, width = barWidth, height = barHeight };
+                for (int i = 0; i < mapModeBar.Length; i++)
+                {
+                    Rect retButtonArea = new Rect(rect.x + buttonMargin + (buttonSize + buttonMargin) * i, buttonMargin, buttonSize, buttonSize).CenteredOnYIn(rectMapModeBar);
+                    int mapModeIndex = mapModeBar[i];
+                    if (Mouse.IsOver(retButtonArea) && mapModeIndex != -1 && mapModeIndex != -2)
+                    {
+                        SwapButtons(currentIndex, mapModeIndex);
+                    }
+                }
+                activeMapModeButtonControl = 0;
+                draggedMapMode = null;
+                draggable = true;
+                return;
+            }
+            if (InBounds() && timeToSwitch <= 0)
+            {
+                bool atEdgeRight = Input.mousePosition.x >= windowRect.x + barWidth + Margin - (buttonSize + buttonMargin);
+                if (atEdgeRight && mapModeBar[MaxButtonsOnBar - 1] == -1)
+                {
+                    currentMapModeIndex++;
+                    SoundDefOf.DragSlider.PlayOneShotOnCamera();
+                }
+                bool atEdgeLeft = Input.mousePosition.x <= windowRect.x + Margin + (buttonSize + buttonMargin);
+                if (atEdgeLeft && mapModeBar[0] == -1)
+                {
+                    currentMapModeIndex--;
+                    SoundDefOf.DragSlider.PlayOneShotOnCamera();
+                }
+                timeToSwitch = 0.5f;
+            }
+
+            void SwapButtons(int indexA, int indexB)
+            {
+                SoundDefOf.Mouseover_Standard.PlayOneShotOnCamera();
+                (MapModes[indexB], MapModes[indexA]) = (MapModes[indexA], MapModes[indexB]);
+            }
+        }
+
+        private void DrawDraggedMapMode()
+        {
+            if (draggedMapMode != null)
+            {
+                float draggedX = UI.MousePositionOnUI.x - buttonSize / 2f - windowRect.x;
+                float draggedY = UI.MousePositionOnUIInverted.y - buttonSize / 2f - windowRect.y;
+                Rect rectDragged = new Rect(draggedX, draggedY, buttonSize, buttonSize);
+                GUI.DrawTexture(new Rect(rectDragged).ContractedBy(4f), draggedMapMode.def.Icon);
+            }
         }
 
         public override void DoWindowContents(Rect inRect)
@@ -79,14 +185,10 @@ namespace MapModeFramework
                 Rect rectMapModeBar = new Rect(0f, rectCurrentMapMode.yMax, barWidth, barHeight);
                 Widgets.DrawShadowAround(new Rect(rectMapModeBar) { width = rectMapModeBar.width, height = rectMapModeBar.height + drawSettingsHeight });
                 Widgets.DrawWindowBackground(rectMapModeBar);
-
-                float buttonSize = 32f;
-                float buttonMargin = 8f;
-                int maxExclusive = (int)(barWidth / (buttonSize + buttonMargin)); //Fill the bar (can accommodate 10 buttons)
-                for (int i = 0; i < maxExclusive; i++)
+                for (int i = 0; i < MaxButtonsOnBar; i++)
                 {
                     Rect rectMapModeButton = new Rect(buttonMargin + (buttonSize + buttonMargin) * i, buttonMargin, buttonSize, buttonSize).CenteredOnYIn(rectMapModeBar);
-                    CreateMapModeButton(rectMapModeButton, i, maxExclusive);
+                    CreateMapModeButton(rectMapModeButton, i, MaxButtonsOnBar);
                 }
 
                 drawSettingsHeight = 0f;
@@ -104,18 +206,23 @@ namespace MapModeFramework
             if (index == 0 && currentMapModeIndex > 0)
             {
                 DoSwitchButton(inRect, true);
+                mapModeBar[index] = -1;
             }
             else if (index == maxOnBar - 1 && currentMapModeIndex + (maxOnBar - 1) < MapModes.Count - 1)
             {
                 DoSwitchButton(inRect, false);
+                mapModeBar[index] = -1;
             }
             else
             {
                 int mapModeIndex = currentMapModeIndex + index;
-                if (mapModeIndex < MapModes.Count)
+                if (mapModeIndex >= MapModes.Count)
                 {
-                    DoMapModeButton(inRect, MapModes[mapModeIndex]);
+                    mapModeBar[index] = -2;
+                    return;
                 }
+                DoMapModeButton(inRect, MapModes[mapModeIndex]);
+                mapModeBar[index] = mapModeIndex;
             }
         }
 
@@ -158,13 +265,41 @@ namespace MapModeFramework
 
         private void DoMapModeButton(Rect inRect, MapMode mapMode)
         {
-            bool currentMapMode = CurrentMapMode == mapMode;
-            Color baseColor = currentMapMode ? Color.yellow : Color.white;
-            GUI.color = Mouse.IsOver(inRect) && !currentMapMode ? GenUI.MouseoverColor : baseColor;
-            GUI.DrawTexture(inRect, mapMode.def.Icon);
-            GUI.color = baseColor;
-            TooltipHandler.TipRegion(inRect, mapMode.def.LabelCap);
-            if (Widgets.ButtonInvisible(inRect, true))
+            Widgets.DrawBoxSolidWithOutline(inRect, Color.clear, Color.white);
+            int controlID = GUIUtility.GetControlID(FocusType.Passive, inRect);
+            if (Input.GetMouseButtonDown(0) && Mouse.IsOver(inRect))
+            {
+                activeMapModeButtonControl = controlID;
+                activeMapModeButtonControlMouseStart = Input.mousePosition;
+                draggable = false;
+            }
+            if (activeMapModeButtonControl == controlID)
+            {
+                if (Input.GetMouseButtonUp(0))
+                {
+                    activeMapModeButtonControl = 0;
+                    draggable = true;
+                }
+                else if (!Input.GetMouseButton(0))
+                {
+                    activeMapModeButtonControl = 0;
+                    draggable = true;
+                }
+                else if (draggedMapMode == null && (activeMapModeButtonControlMouseStart - Input.mousePosition).sqrMagnitude > 20f)
+                {
+                    draggedMapMode = mapMode;
+                }
+            }
+            if (draggedMapMode == mapMode)
+            {
+                return;
+            }
+            bool isCurrentMapMode = CurrentMapMode == mapMode;
+            Color baseColor = isCurrentMapMode ? Color.yellow : Color.white;
+            Color mouseOverColor = Mouse.IsOver(inRect) && !isCurrentMapMode ? GenUI.MouseoverColor : baseColor;
+            string tooltip = $"{mapMode.def.LabelCap}\n{"MMF.UI.Tooltip.DragToSort".Translate().Colorize(Color.gray)}";
+            TooltipHandler.TipRegion(new Rect(inRect), tooltip);
+            if (Widgets.ButtonImage(inRect.ContractedBy(4f), mapMode.def.Icon, baseColor, mouseOverColor))
             {
                 SoundDefOf.Click.PlayOneShotOnCamera();
                 mapMode.OnButtonClick();
@@ -185,11 +320,13 @@ namespace MapModeFramework
             DoDrawSettingsCheckbox(ref inRect, "MMF.DrawSettings.DrawRoads".Translate(), ref drawSettings.drawRoads, false);
             DoDrawSettingsCheckbox(ref inRect, "MMF.DrawSettings.DrawPollution".Translate(), ref drawSettings.drawPollution, false);
             DoDrawSettingsCheckbox(ref inRect, "MMF.DrawSettings.DisableFeaturesText".Translate(), ref drawSettings.disableFeaturesText, false);
-            if (CurrentMapMode.HasLabels)
+            bool? displayLabels = CurrentMapMode.def.displayLabels;
+            if (displayLabels.HasValue && displayLabels.Value)
             {
                 DoDrawSettingsCheckbox(ref inRect, "MMF.DrawSettings.DisplayLabels".Translate(), ref drawSettings.displayLabels, false);
             }
-            if (CurrentMapMode.HasTooltip)
+            bool? doTooltip = CurrentMapMode.def.doTooltip;
+            if (doTooltip.HasValue && doTooltip.Value)
             {
                 DoDrawSettingsCheckbox(ref inRect, "MMF.DrawSettings.DoTooltip".Translate(), ref drawSettings.doTooltip, false);
             }
@@ -204,7 +341,7 @@ namespace MapModeFramework
             inRect.y += Text.LineHeight;
             if (regenerateOnChange && storedSetting != setting)
             {
-                parent.regenerateNow = true;
+                parent.RegenerateNow();
             }
         }
     }

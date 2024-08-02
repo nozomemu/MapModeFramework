@@ -9,6 +9,8 @@ namespace MapModeFramework
         private const int selectorRenderQueue = 3560;
         private const int terrainOverlayRenderQueue = 3510;
 
+        private const int numMatsGrowingPeriod = 7;
+
         public static readonly Material matWhiteOverlay;
         public static readonly Material matGreenOverlay;
         public static readonly Material matMouseRegion;
@@ -23,6 +25,8 @@ namespace MapModeFramework
         private static readonly Color[] ElevationSpectrum;
         private static Material[] matsRainfall;
         private static readonly Color[] RainfallSpectrum;
+        private static Material[] matsGrowingPeriod;
+        private static readonly Color[] GrowingPeriodSpectrum;
 
         public static Material[] matsCommonality;
         private static readonly Color[] CommonalitySpectrum;
@@ -85,6 +89,11 @@ namespace MapModeFramework
                 GenColor.FromBytes(13, 150, 5),
                 GenColor.FromBytes(5, 112, 94)
             };
+            GrowingPeriodSpectrum = new Color[2]
+            {
+                new Color(1f, 1f, 1f, 1f),
+                new Color(0f, 1f, 0f, 1f)
+            };
             CommonalitySpectrum = new Color[11]
             {
                 new Color(1f, 1f, 1f), //White or 0
@@ -103,6 +112,7 @@ namespace MapModeFramework
             GenerateMats(ref matsTemperature, TemperatureSpectrum, NumMatsPerMode);
             GenerateMats(ref matsElevation, ElevationSpectrum, NumMatsPerMode);
             GenerateMats(ref matsRainfall, RainfallSpectrum, NumMatsPerMode);
+            GenerateMats(ref matsGrowingPeriod, GrowingPeriodSpectrum, numMatsGrowingPeriod);
             GenerateMats(ref matsCommonality, CommonalitySpectrum, NumMatsPerMode);
         }
 
@@ -135,16 +145,22 @@ namespace MapModeFramework
             return matsElevation[Mathf.Clamp(value, 0, NumMatsPerMode - 1)];
         }
 
-        public static Material MatForCommonalityOverlay(float commonality)
-        {
-            int value = Mathf.FloorToInt(commonality * (float)NumMatsPerMode);
-            return matsCommonality[Mathf.Clamp(value, 0, NumMatsPerMode - 1)];
-        }
-
         public static Material MatForRainfallOverlay(float rain)
         {
             int value = Mathf.FloorToInt(Mathf.InverseLerp(0f, 5000f, rain) * (float)NumMatsPerMode);
             return matsRainfall[Mathf.Clamp(value, 0, NumMatsPerMode - 1)];
+        }
+
+        public static Material MatForGrowingPeriodOverlay(float growingPeriod)
+        {
+            int value = Mathf.FloorToInt(growingPeriod / 2f);
+            return matsGrowingPeriod[Mathf.Clamp(value, 0, numMatsGrowingPeriod - 1)];
+        }
+
+        public static Material MatForCommonalityOverlay(float commonality)
+        {
+            int value = Mathf.FloorToInt(Mathf.InverseLerp(0f, 1f, commonality) * (float)NumMatsPerMode);
+            return matsCommonality[Mathf.Clamp(value, 0, NumMatsPerMode - 1)];
         }
     }
 }

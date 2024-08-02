@@ -1,7 +1,11 @@
 ﻿using RimWorld;
 using RimWorld.Planet;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 
@@ -11,9 +15,13 @@ namespace MapModeFramework
     {
         public MapModeComponent MapModeComponent => MapModeComponent.Instance;
         public MapMode CurrentMapMode => MapModeComponent.currentMapMode;
-        public virtual bool Active => CurrentMapMode?.WorldLayerClass == GetType();
+        public virtual bool Active => CurrentMapMode?.WorldLayerClass == GetType() && CurrentMapMode.Active;
 
-        public override bool ShouldRegenerate => MapModeComponent.regenerateNow;
+        public bool Regenerated => !ShouldRegenerate && ready;
+        public override bool ShouldRegenerate => MapModeComponent.regenerateNow && Active && ready;
+        protected bool ready = true;
+
+        protected virtual bool RegenerateAsynchronously => true;
 
         public override void Render()
         {
@@ -63,33 +71,96 @@ namespace MapModeFramework
             {
                 yield break;
             }
-            DoMeshes();
-            FinalizeMesh(MeshParts.All);
-            MapModeComponent.regenerateNow = false;
+            if (RegenerateAsynchronously && !WorldRegenHandler.IsBusy)
+            {
+                WorldRegenHandler.RequestAsyncWorldRegeneration(this);
+            }
         }
 
-        public virtual void DoMeshes()
+        public virtual async Task BuildSubMeshes(CancellationToken token)
         {
+            ready = false;
+            bool interrupted = false;
+            Dictionary<Material, List<int>> tileMaterials = new Dictionary<Material, List<int>>();
+            try
+            {
+                await Task.Run(() => PrepareMeshes(tileMaterials, token), token);
+            }
+            catch (OperationCanceledException)
+            {
+                Core.Message("Async regeneration interrupted");
+                interrupted = true;
+            }
+            catch (Exception ex)
+            {
+                Core.Error($"Error during asynchronous regeneration of {this}: {ex.Message}");
+            }
+            finally
+            {
+                if (!interrupted)
+                {
+                    foreach (var (material, tiles) in tileMaterials)
+                    {
+                        tiles.ForEach(tile =>
+                        {
+                            LayerSubMesh subMesh = GetSubMesh(material);
+                            TileUtilities.DrawTile(subMesh, tile);
+                        });
+                    }
+                    FinalizeMesh(MeshParts.All);
+                    MapModeComponent.Notify_RegenerationComplete(CurrentMapMode);
+                }
+                WorldRegenHandler.Notify_Finished();
+                ready = true;
+            }
+        }
+
+        public virtual void PrepareMeshes(Dictionary<Material, List<int>> tileMaterials, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
             WorldGrid grid = Find.WorldGrid;
             List<Tile> tiles = grid.tiles;
-            for (int i = 0; i < tiles.Count; i++)
+            int tilesCount = tiles.Count;
+
+            token.ThrowIfCancellationRequested();
+            var allTiles = Enumerable.Range(0, tilesCount - 1);
+            WorldRegenHandler.tilesToPrepare = allTiles.Where(x => ValidTile(x, false)).Count();
+            
+            for (int i = 0; i < tilesCount; i++)
             {
-                if (tiles[i].WaterCovered && !MapModeComponent.drawSettings.includeWater)
+                token.ThrowIfCancellationRequested();
+                if (!ValidTile(i, false))
                 {
                     continue;
                 }
-                if (!ModCompatibility.DrawTile(i))
-                {
-                    continue;
-                }
+                token.ThrowIfCancellationRequested();
                 Material material = GetMaterial(i);
                 if (material == BaseContent.ClearMat)
                 {
                     continue;
                 }
-                LayerSubMesh subMesh = GetSubMesh(material);
-                TileUtilities.DrawTile(subMesh, i);
+                token.ThrowIfCancellationRequested();
+                if (!tileMaterials.TryGetValue(material, out List<int> tileList))
+                {
+                    tileList = new List<int>();
+                    tileMaterials[material] = tileList;
+                }
+                tileList.Add(i);
+                WorldRegenHandler.tilesPrepared++;
             }
+        }
+
+        public bool ValidTile(int tile, bool allPossible = true)
+        {
+            if (!allPossible && !ModCompatibility.DrawTile(tile))
+            {
+                return false;
+            }
+            if (Find.WorldGrid[tile].WaterCovered && (!CurrentMapMode.CanToggleWater || !MapModeComponent.drawSettings.includeWater))
+            {
+                return false;
+            }
+            return true;
         }
 
         public virtual Material GetMaterial(int tile) => CurrentMapMode.GetMaterial(tile);

@@ -1,7 +1,7 @@
-﻿using RimWorld.Planet;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 
@@ -20,74 +20,169 @@ namespace MapModeFramework
             Instance = this;
         }
 
-        public override void DoMeshes()
+        public override async Task BuildSubMeshes(CancellationToken token)
         {
-            for (int i = 0; i < Regions.Count; i++)
+            ready = false;
+            bool interrupted = false;
+            Dictionary<Material, List<int>> tileMaterials = new Dictionary<Material, List<int>>();
+            Dictionary<Region, Dictionary<int, bool[]>> regionTileEdgesDrawInfo = new Dictionary<Region, Dictionary<int, bool[]>>();
+            try
             {
+                Regions.ForEach(region =>
+                {
+                    if (!region.skipBody && region.material != BaseContent.ClearMat)
+                    {
+                        WorldRegenHandler.tilesToPrepare += region.tiles.Count;
+                    }
+                    if (region.doBorders && region.borderMaterial != BaseContent.ClearMat)
+                    {
+                        WorldRegenHandler.tilesToPrepare += region.GetBorders().Count;
+                    }
+                });
+                Task prepareMeshes = Task.Run(() => PrepareMeshes(tileMaterials, token), token);
+                Task prepareBorders = Task.Run(() => PrepareBorders(regionTileEdgesDrawInfo, token), token);
+                await Task.WhenAll(prepareMeshes, prepareBorders);
+            }
+            catch (OperationCanceledException)
+            {
+                Core.Message("Async regeneration interrupted");
+                interrupted = true;
+            }
+            catch (Exception ex)
+            {
+                Core.Error($"Error during asynchronous regeneration of {this}: {ex.Message}");
+            }
+            finally
+            {
+                if (!interrupted)
+                {
+                    foreach (var (material, tiles) in tileMaterials)
+                    {
+                        tiles.ForEach(tile =>
+                        {
+                            LayerSubMesh subMesh = GetSubMesh(material);
+                            TileUtilities.DrawTile(subMesh, tile);
+                        });
+                    }
+                    int regionsCount = Regions.Count;
+                    for (int i = 0; i < regionsCount; i++)
+                    {
+                        Region region = Regions[i];
+                        if (!region.doBorders || region.borderMaterial == BaseContent.ClearMat)
+                        {
+                            continue;
+                        }
+                        DoRegionBorders(region, regionTileEdgesDrawInfo[region]);
+                    }
+                    FinalizeMesh(MeshParts.All);
+                    MapModeComponent.Notify_RegenerationComplete(CurrentMapMode);
+                }
+                WorldRegenHandler.Notify_Finished();
+                ready = true;
+            }
+        }
+
+        public override void PrepareMeshes(Dictionary<Material, List<int>> tileMaterials, CancellationToken token)
+        {
+            int regionsCount = Regions.Count;
+            for (int i = 0; i < regionsCount; i++)
+            {
+                token.ThrowIfCancellationRequested();
                 Region region = Regions[i];
-                if (!region.skipBody && region.material != BaseContent.ClearMat)
+                if (region.skipBody || region.material == BaseContent.ClearMat)
                 {
-                    DoRegionTiles(region);
+                    continue;
                 }
-                if (region.doBorders && region.borderMaterial != BaseContent.ClearMat)
+                token.ThrowIfCancellationRequested();
+                Material regionMaterial = region.material;
+                List<int> regionTiles = region.tiles;
+                int regionTilesCount = regionTiles.Count;
+                for (int j = 0; j < regionTilesCount; j++)
                 {
-                    DoRegionBorders(region);
+                    int tile = regionTiles[j];
+                    token.ThrowIfCancellationRequested();
+                    if (!ValidTile(tile, false))
+                    {
+                        continue;
+                    }
+                    token.ThrowIfCancellationRequested();
+                    if (!tileMaterials.TryGetValue(regionMaterial, out List<int> tileList))
+                    {
+                        tileList = new List<int>();
+                        tileMaterials[regionMaterial] = tileList;
+                    }
+                    tileList.Add(tile);
+                    WorldRegenHandler.tilesPrepared++;
                 }
             }
         }
 
-        public virtual void DoRegionTiles(Region region)
+        public void PrepareBorders(Dictionary<Region, Dictionary<int, bool[]>> regionTileEdgesDrawInfo, CancellationToken token)
         {
-            WorldGrid grid = Find.WorldGrid;
-            List<int> regionTiles = region.tiles;
-            for (int i = 0; i < regionTiles.Count; i++)
+            int regionsCount = Regions.Count;
+            for (int i = 0; i < regionsCount; i++)
             {
-                if (grid[regionTiles[i]].WaterCovered && !MapModeComponent.drawSettings.includeWater)
+                token.ThrowIfCancellationRequested();
+                Region region = Regions[i];
+                if (!region.doBorders || region.borderMaterial == BaseContent.ClearMat)
                 {
-                    continue;
+                    return;
                 }
-                if (!ModCompatibility.DrawTile(regionTiles[i]))
+                token.ThrowIfCancellationRequested();
+                Material borderMaterial = region.borderMaterial;
+                List<int> regionTiles = region.tiles;
+                List<int> borderTiles = region.GetBorders();
+                int borderTilesCount = borderTiles.Count;
+                bool excludeNeighbor(int x) => regionTiles.Contains(x) && !borderTiles.Contains(x);
+                bool neighborIsContiguous(int x) => regionTiles.Contains(x) && borderTiles.Contains(x);
+                for (int j = 0; j < borderTilesCount; j++)
                 {
-                    continue;
+                    token.ThrowIfCancellationRequested();
+                    int tile = borderTiles[j];
+                    if (!regionTileEdgesDrawInfo.TryGetValue(region, out var tileEdgesDrawInfo))
+                    {
+                        tileEdgesDrawInfo = new Dictionary<int, bool[]>();
+                        regionTileEdgesDrawInfo[region] = tileEdgesDrawInfo;
+                    }
+                    PrepareEdges(region, tile, excludeNeighbor, neighborIsContiguous, tileEdgesDrawInfo);
+                    WorldRegenHandler.tilesPrepared++;
                 }
-                LayerSubMesh subMesh = GetSubMesh(region.material);
-                TileUtilities.DrawTile(subMesh, regionTiles[i]);
             }
         }
 
-        public virtual void DoRegionBorders(Region region, bool caching = false)
+        public virtual void DoRegionBorders(Region region, Dictionary<int, bool[]> tileEdgesDrawInfo, MapMode_Region cachingMapMode = null)
         {
             List<int> regionTiles = region.tiles;
             List<int> borders = region.GetBorders();
+            bool excludeNeighbor(int x) => regionTiles.Contains(x) && !borders.Contains(x);
+            bool neighborIsContiguous(int x) => regionTiles.Contains(x) && borders.Contains(x);
             for (int i = 0; i < borders.Count; i++)
             {
-                bool excludeNeighbor(int x) => regionTiles.Contains(x) && !borders.Contains(x);
-                bool neighborIsContiguous(int x) => regionTiles.Contains(x) && borders.Contains(x);
-                if (caching)
+                int borderTile = borders[i];
+                if (cachingMapMode != null)
                 {
-                    PrepareEdges(region, borders[i], excludeNeighbor, neighborIsContiguous, out _, out _);
+                    PrepareEdges(region, borderTile, excludeNeighbor, neighborIsContiguous, tileEdgesDrawInfo, cachingMapMode);
                     continue;
                 }
-                if (!ModCompatibility.DrawTile(borders[i]))
+                if (!ModCompatibility.DrawTile(borderTile))
                 {
                     continue;
                 }
                 LayerSubMesh subMesh = GetSubMesh(region.borderMaterial);
-                OutlineVertices(region, borders[i], excludeNeighbor, neighborIsContiguous, subMesh, region.borderWidth);
+                OutlineVertices(borderTile, tileEdgesDrawInfo[borderTile], subMesh, region.borderWidth);
             }
         }
 
-        //Cache edges since this is where the regeneration bottlenecks at higher world coverages
-        private void PrepareEdges(Region region, int tile, Predicate<int> excludeNeighbor, Predicate<int> neighborIsContiguous, out List<Tuple<Vector3, Vector3>> edges, out bool[] drawEdges)
+        private void PrepareEdges(Region region, int tile, Predicate<int> excludeNeighbor, Predicate<int> neighborIsContiguous, Dictionary<int, bool[]> tileEdgesDrawInfo, MapMode_Region cachingMapMode = null)
         {
             List<Vector3> vertices = TileUtilities.GetTileVertices(tile);
-            edges = new List<Tuple<Vector3, Vector3>>();
+            List<Tuple<Vector3, Vector3>> edges = new List<Tuple<Vector3, Vector3>>();
             for (int i = 0; i < vertices.Count; i++)
             {
                 Vector3 next = vertices[(i + 1) % vertices.Count];
                 edges.Add(new Tuple<Vector3, Vector3>(vertices[i], next));
             }
-            drawEdges = EdgesCache.GetEdgeDrawInfo(region, tile);
+            bool[] drawEdges = EdgesCache.GetEdgeDrawInfo(region, tile);
             if (drawEdges == null)
             {
                 drawEdges = new bool[edges.Count];
@@ -130,13 +225,25 @@ namespace MapModeFramework
                         }
                     }
                 }
-                EdgesCache.AddEdgeDrawInfo(region, tile, drawEdges);
+                cachingMapMode ??= CurrentMapMode;
+                if (cachingMapMode.EnabledCaching)
+                {
+                    EdgesCache.AddEdgeDrawInfo(region, tile, drawEdges);
+                    cachingMapMode.tilesCached++;
+                }
             }
+            tileEdgesDrawInfo?.Add(tile, drawEdges);
         }
 
-        public void OutlineVertices(Region region, int tile, Predicate<int> excludeNeighbor, Predicate<int> neighborIsContiguous, LayerSubMesh subMesh, float borderWidth)
+        public void OutlineVertices(int tile, bool[] drawEdges, LayerSubMesh subMesh, float borderWidth)
         {
-            PrepareEdges(region, tile, excludeNeighbor, neighborIsContiguous, out var edges, out var drawEdges);
+            List<Vector3> vertices = TileUtilities.GetTileVertices(tile);
+            List<Tuple<Vector3, Vector3>> edges = new List<Tuple<Vector3, Vector3>>();
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                Vector3 next = vertices[(i + 1) % vertices.Count];
+                edges.Add(new Tuple<Vector3, Vector3>(vertices[i], next));
+            }
             int edgeCount = edges.Count;
             for (int i = 0; i < edgeCount; i++)
             {

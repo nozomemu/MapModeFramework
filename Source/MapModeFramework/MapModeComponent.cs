@@ -54,6 +54,7 @@ namespace MapModeFramework
     {
         public static MapModeComponent Instance;
 
+        public List<MapModeDef> mapModeDefs = new List<MapModeDef>();
         public List<MapMode> mapModes = new List<MapMode>();
         public bool mapModesInitialized;
 
@@ -78,40 +79,43 @@ namespace MapModeFramework
 
         public void InitializeMapModes()
         {
-            List<MapModeDef> defs = DefDatabase<MapModeDef>.AllDefsListForReading;
-            foreach (MapModeDef def in defs.Where(x => !mapModes.Any(y => y.def == x)))
+            foreach (MapModeDef def in mapModeDefs.ToList())
             {
-                Type mapModeType = def.mapModeClass ?? typeof(MapMode);
+                Type mapModeType = def.mapModeClass ?? typeof(MapMode_Default);
                 MapMode mapMode = Activator.CreateInstance(mapModeType, def) as MapMode;
                 mapModes.Add(mapMode);
             }
-            CacheMapModes();
+            List<MapModeDef> defs = DefDatabase<MapModeDef>.AllDefsListForReading;
+            foreach (MapModeDef def in defs.Where(x => !mapModes.Any(y => y.def == x)))
+            {
+                Type mapModeType = def.mapModeClass ?? typeof(MapMode_Default);
+                MapMode mapMode = Activator.CreateInstance(mapModeType, def) as MapMode;
+                mapModes.Add(mapMode);
+                mapModeDefs.Add(def);
+            }
             Reset();
+            CacheMapModes();
             mapModesInitialized = true;
         }
 
         private void CacheMapModes()
         {
-            MapMode storedMapMode = currentMapMode;
             int mapModeCount = mapModes.Count;
             for (int i = 0; i < mapModeCount; i++)
             {
-                if (!(mapModes[i] is MapMode_Region mapModeRegion))
+                MapMode mapMode = mapModes[i];
+                if (!(mapMode is MapMode_Cached mapModeCached))
                 {
                     continue;
                 }
-                if (mapModeRegion.def.RegionProperties.cacheOnLoad && !mapModeRegion.cached)
+                if (mapModeCached.CacheOnStart)
                 {
-                    currentMapMode = mapModeRegion;
-                    int regionCount = mapModeRegion.regions.Count;
-                    for (int j = 0; j < regionCount; j++)
+                    TaskHandler.StartQueue(async (token) =>
                     {
-                        mapModeRegion.WorldLayer.DoRegionBorders(mapModeRegion.regions[j], true);
-                    }
-                    mapModeRegion.cached = true;
+                        await mapModeCached.PopulateCache(token);
+                    });
                 }
             }
-            currentMapMode = storedMapMode;
         }
 
         public override void GameComponentUpdate()
@@ -133,25 +137,105 @@ namespace MapModeFramework
             currentMapMode?.MapModeOnGUI();
         }
 
+        public void RequestMapModeSwitch(MapMode mapMode)
+        {
+            MapModeDef def = mapMode.def;
+            if (mapMode.WorldLayerClass == null)
+            {
+                if (def != MapModeFrameworkDefOf.Default)
+                {
+                    Core.Warning($"Loaded MapModeDef {def.defName} that has no WorldLayerClass. This is likely unintended.");
+                }
+            }
+            _ = WorldRegenHandler.RequestMapModeSwitch(mapMode);
+        }
+
+        public void SwitchMapMode(MapMode mapMode)
+        {
+            currentMapMode = mapMode;
+            UpdateMapMode(mapMode.def);
+            RegenerateNow();
+        }
+
         public void UpdateMapMode(MapModeDef def)
         {
             drawSettings.Update(def);
             Find.WorldFeatures.UpdateFeatures();
         }
 
-        public void Reset()
+        public void Reset(bool fullReset = false)
         {
             currentMapMode = mapModes.First(x => x.def == MapModeFrameworkDefOf.Default);
             drawSettings.Reset();
             regenerateNow = false;
+            if (fullReset)
+            {
+                mapModeDefs.Clear();
+                mapModes.Clear();
+                mapModesInitialized = false;
+            }
+        }
+
+        public void RegenerateNow()
+        {
+            currentMapMode.DoPreRegenerate();
+            regenerateNow = true;
+        }
+
+        public void Notify_RegenerationComplete(MapMode mapMode)
+        {
+            regenerateNow = false;
+            if (mapMode is MapMode_Cached mapModeCached && mapModeCached.EnabledCaching)
+            {
+                mapModeCached.cached = true;
+            }
+        }
+
+        public void Notify_CachingComplete(MapMode mapMode)
+        {
+            if (currentMapMode == mapMode)
+            {
+                RegenerateNow();
+            }
         }
 
         public void Notify_RegionChanged()
         {
-            if (currentMapMode is MapMode_Region mapModeRegion)
+            RegenerateNow();
+        }
+
+        public void Notify_TileChanged(int tile)
+        {
+            int mapModesCount = mapModes.Count;
+            for (int i = 0; i < mapModesCount; i++)
             {
-                mapModeRegion.DoPreRegenerate();
-                regenerateNow = true;
+                MapMode mapMode = mapModes[i];
+                mapMode.Notify_TileChanged(tile);
+            }
+        }
+
+        public override void ExposeData()
+        {
+            if (Scribe.mode == LoadSaveMode.Saving)
+            {
+                mapModeDefs.Clear();
+                foreach (MapMode mapMode in mapModes)
+                {
+                    mapModeDefs.Add(mapMode.def);
+                }
+            }
+            Scribe_Collections.Look(ref mapModeDefs, "MMF.MapModeDefs", LookMode.Def);
+            if (Scribe.mode == LoadSaveMode.LoadingVars)
+            {
+                mapModeDefs ??= new List<MapModeDef>();
+                mapModes ??= new List<MapMode>();
+                foreach (MapModeDef mapModeDef in mapModeDefs)
+                {
+                    if (mapModeDef == null)
+                    {
+                        mapModeDefs.Remove(mapModeDef);
+                    }
+                }
             }
         }
     }

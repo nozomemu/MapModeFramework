@@ -14,6 +14,16 @@
 	<MMF.DrawSettings.DisplayLabels>Display Labels</MMF.DrawSettings.DisplayLabels>
 	<MMF.DrawSettings.DoTooltip>Do Tooltip</MMF.DrawSettings.DoTooltip>
 	
+	<MMF.UI.Tooltip.DragToSort>Drag button to sort</MMF.UI.Tooltip.DragToSort>
+	<MMF.UI.LoadProgress>Prepared {0} out of {1} tiles</MMF.UI.LoadProgress>
+	<MMF.UI.TryCache>Enable caching for this map mode if you would like to shorten regeneration time.</MMF.UI.TryCache>
+	<MMF.UI.Caching>Caching</MMF.UI.Caching>
+	
+	<MMF.Settings.CacheData>Cache Data</MMF.Settings.CacheData>
+	<MMF.Settings.EnableCaching>Enable caching</MMF.Settings.EnableCaching>
+	<MMF.Settings.CacheOnStart>Cache on start</MMF.Settings.CacheOnStart>
+	
+	<MMF.Commonality>Commonality</MMF.Commonality>
 	<MMF.Type>Type</MMF.Type>
 	
 	<MMF.WorldFeatures.Island>Island</MMF.WorldFeatures.Island>
