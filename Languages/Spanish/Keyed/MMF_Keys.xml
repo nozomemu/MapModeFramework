@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<MMF.CurrentMapMode>Tipo de Mapa</MMF.CurrentMapMode>
+	
+	<MMF.DrawSettings>Ajustes</MMF.DrawSettings>
+	<MMF.DrawSettings.IncludeWater>Incluir Agua</MMF.DrawSettings.IncludeWater>
+	<MMF.DrawSettings.Opacity>Opacidad</MMF.DrawSettings.Opacity>
+	<MMF.DrawSettings.DrawWorldObjects>Objetos del Mundo</MMF.DrawSettings.DrawWorldObjects>
+	<MMF.DrawSettings.DrawHills>Mostrar Colinas</MMF.DrawSettings.DrawHills>
+	<MMF.DrawSettings.DrawRivers>Mostrar Ríos</MMF.DrawSettings.DrawRivers>
+	<MMF.DrawSettings.DrawRoads>Mostrar Carreteras</MMF.DrawSettings.DrawRoads>
+	<MMF.DrawSettings.DrawPollution>Mostrar Contaminación</MMF.DrawSettings.DrawPollution>
+	<MMF.DrawSettings.DisableFeaturesText>Desactivar Textos</MMF.DrawSettings.DisableFeaturesText>
+	<MMF.DrawSettings.DisplayLabels>Mostrar Etiquetas</MMF.DrawSettings.DisplayLabels>
+	<MMF.DrawSettings.DoTooltip>Info Emergente</MMF.DrawSettings.DoTooltip>
+	
+	<MMF.UI.Tooltip.DragToSort>Arrastra el botón para ordenar</MMF.UI.Tooltip.DragToSort>
+	<MMF.UI.LoadProgress>Preparado {0} de {1} casillas</MMF.UI.LoadProgress>
+	<MMF.UI.TryCache>Habilita la caché para este tipo de mapa si deseas acortar el tiempo de regeneración.</MMF.UI.TryCache>
+	<MMF.UI.Caching>Almacenamiento en Caché</MMF.UI.Caching>
+	
+	<MMF.Settings.CacheData>Datos en Caché</MMF.Settings.CacheData>
+	<MMF.Settings.EnableCaching>Habilitar almacenamiento en caché</MMF.Settings.EnableCaching>
+	<MMF.Settings.CacheOnStart>Almacenar en caché al iniciar</MMF.Settings.CacheOnStart>
+	
+	<MMF.Commonality>Presencia</MMF.Commonality>
+	<MMF.Type>Tipo</MMF.Type>
+	
+	<MMF.WorldFeatures.Island>Isla</MMF.WorldFeatures.Island>
+	<MMF.WorldFeatures.Archipelago>Archipiélago</MMF.WorldFeatures.Archipelago>
+	<MMF.WorldFeatures.Peninsula>Península</MMF.WorldFeatures.Peninsula>
+	<MMF.WorldFeatures.Bay>Bahía</MMF.WorldFeatures.Bay>
+	<MMF.WorldFeatures.Lake>Lago</MMF.WorldFeatures.Lake>
+	<MMF.WorldFeatures.Sea>Mar</MMF.WorldFeatures.Sea>
+	<MMF.WorldFeatures.OceanBay>Bahía Oceánica</MMF.WorldFeatures.OceanBay>
+	<MMF.WorldFeatures.Ocean>Océano</MMF.WorldFeatures.Ocean>
+	<MMF.WorldFeatures.OuterOcean>Océano Exterior</MMF.WorldFeatures.OuterOcean>
+	<MMF.WorldFeatures.MountainRange>Cordillera</MMF.WorldFeatures.MountainRange>
+	<MMF.WorldFeatures.Desert>Desierto</MMF.WorldFeatures.Desert>
+	<MMF.WorldFeatures.TemperateSwamp>Pantano Templado</MMF.WorldFeatures.TemperateSwamp>
+	<MMF.WorldFeatures.TropicalSwamp>Pantano Tropical</MMF.WorldFeatures.TropicalSwamp>
+	<MMF.WorldFeatures.ColdBog>Pantano Frío</MMF.WorldFeatures.ColdBog>
+	<MMF.WorldFeatures.TemperateForest>Bosque Templado</MMF.WorldFeatures.TemperateForest>
+	<MMF.WorldFeatures.TropicalRainforest>Selva Tropical</MMF.WorldFeatures.TropicalRainforest>
+	<MMF.WorldFeatures.BorealForest>Bosque Boreal</MMF.WorldFeatures.BorealForest>
+	<MMF.WorldFeatures.AridShrubland>Matorral Árido</MMF.WorldFeatures.AridShrubland>
+	<MMF.WorldFeatures.IceSheet>Capa de Hielo</MMF.WorldFeatures.IceSheet>
+	<MMF.WorldFeatures.Tundra>Tundra</MMF.WorldFeatures.Tundra>
+</LanguageData>
