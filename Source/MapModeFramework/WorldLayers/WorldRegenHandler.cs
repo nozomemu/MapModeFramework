@@ -6,7 +6,7 @@ namespace MapModeFramework
 {
     public static class WorldRegenHandler
     {
-        private static Task currentRegenTask;
+        public static Task currentRegenTask;
         private static CancellationTokenSource cancelTokenSource;
 
         public static bool IsBusy => currentRegenTask?.IsCompleted == false;
@@ -67,6 +67,7 @@ namespace MapModeFramework
             tilesPrepared = 0;
             if (fullReset)
             {
+                currentRegenTask = null;
                 DisposeCancellationTokenSource();
                 regeneratingMapMode = null;
                 startTime = default;
