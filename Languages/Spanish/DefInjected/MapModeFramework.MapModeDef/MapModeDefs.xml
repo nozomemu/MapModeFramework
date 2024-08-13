@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<LanguageData>
+<!--  EN: Animal Commonality  -->
+<AnimalCommonality.label>Presencia de animales</AnimalCommonality.label>
+<!--  EN: Biome  -->
+<Biome.label>Bioma</Biome.label>
+<!--  EN: Default  -->
+<Default.label>Por defecto</Default.label>
+<!--  EN: Elevation  -->
+<Elevation.label>Elevación</Elevation.label>
+<!--  EN: Features  -->
+<Features.label>Características</Features.label>
+<!--  EN: Growing Period  -->
+<GrowingPeriod.label>Período de crecimiento</GrowingPeriod.label>
+<!--  EN: Plant Commonality  -->
+<PlantCommonality.label>Presencia de plantas</PlantCommonality.label>
+<!--  EN: Rainfall  -->
+<Rainfall.label>Precipitación</Rainfall.label>
+<!--  EN: Temperature  -->
+<Temperature.label>Temperatura</Temperature.label>
+</LanguageData>
