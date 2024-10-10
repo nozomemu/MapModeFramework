@@ -122,6 +122,8 @@ namespace MapModeFramework
         public static MapModeDef Temperature;
         public static MapModeDef Elevation;
         public static MapModeDef Rainfall;
+        public static MapModeDef Swampiness;
+        public static MapModeDef Pollution;
         public static MapModeDef GrowingPeriod;
         public static MapModeDef Features;
     }

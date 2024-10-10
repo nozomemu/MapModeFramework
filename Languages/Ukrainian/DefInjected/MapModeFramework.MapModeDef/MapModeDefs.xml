@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<LanguageData>
+<!--  EN: Animal Commonality  -->
+<AnimalCommonality.label>Поширеність тварин</AnimalCommonality.label>
+<!--  EN: Biome  -->
+<Biome.label>Біоми</Biome.label>
+<!--  EN: Default  -->
+<Default.label>Звичайний</Default.label>
+<!--  EN: Elevation  -->
+<Elevation.label>Висота</Elevation.label>
+<!--  EN: Features  -->
+<Features.label>Місцевість</Features.label>
+<!--  EN: Growing Period  -->
+<GrowingPeriod.label>Періуд росту</GrowingPeriod.label>
+<!--  EN: Plant Commonality  -->
+<PlantCommonality.label>Поширеність рослин</PlantCommonality.label>
+<!--  EN: Rainfall  -->
+<Rainfall.label>Опади</Rainfall.label>
+<!--  EN: Temperature  -->
+<Temperature.label>Температура</Temperature.label>
+<!--  EN: Swampiness  -->
+<Swampiness.label>Болотяність</Swampiness.label>
+<!--  EN: Pollution  -->
+<Pollution.label>Забрудненість</Pollution.label>
+</LanguageData>

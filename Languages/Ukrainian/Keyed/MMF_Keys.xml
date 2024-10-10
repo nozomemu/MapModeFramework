@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<MMF.CurrentMapMode>Режим карти</MMF.CurrentMapMode>
+	
+	<MMF.DrawSettings>Налаштування</MMF.DrawSettings>
+	<MMF.DrawSettings.IncludeWater>Вода</MMF.DrawSettings.IncludeWater>
+	<MMF.DrawSettings.Opacity>Прозорість</MMF.DrawSettings.Opacity>
+	<MMF.DrawSettings.DrawWorldObjects>Об'єкти</MMF.DrawSettings.DrawWorldObjects>
+	<MMF.DrawSettings.DrawHills>Гори</MMF.DrawSettings.DrawHills>
+	<MMF.DrawSettings.DrawRivers>Річки</MMF.DrawSettings.DrawRivers>
+	<MMF.DrawSettings.DrawRoads>Дороги</MMF.DrawSettings.DrawRoads>
+	<MMF.DrawSettings.DrawPollution>Забруднення</MMF.DrawSettings.DrawPollution>
+	<MMF.DrawSettings.DisableFeaturesText>Назви місцевості</MMF.DrawSettings.DisableFeaturesText>
+	<MMF.DrawSettings.DisplayLabels>Назви</MMF.DrawSettings.DisplayLabels>
+	<MMF.DrawSettings.DoTooltip>Підказки</MMF.DrawSettings.DoTooltip>
+	
+	<MMF.UI.Tooltip.DragToSort>Перетягніть кнопку для сортування</MMF.UI.Tooltip.DragToSort>
+	<MMF.UI.LoadProgress>Підготовлено {0} з {1} тайлів</MMF.UI.LoadProgress>
+	<MMF.UI.TryCache>Увімкніть кешування, якщо ви хочете скоротити час повторної генерації.</MMF.UI.TryCache>
+	<MMF.UI.Caching>Кешування</MMF.UI.Caching>
+	
+	<MMF.Settings.CacheData>Кешувати</MMF.Settings.CacheData>
+	<MMF.Settings.EnableCaching>Увімкнути кешування</MMF.Settings.EnableCaching>
+	<MMF.Settings.CacheOnStart>Кешуваити при старті</MMF.Settings.CacheOnStart>
+	
+	<MMF.Commonality>Поширеність</MMF.Commonality>
+	<MMF.Type>Тип</MMF.Type>
+	
+	<MMF.WorldFeatures.Island>Острів</MMF.WorldFeatures.Island>
+	<MMF.WorldFeatures.Archipelago>Архіпелаг</MMF.WorldFeatures.Archipelago>
+	<MMF.WorldFeatures.Peninsula>Півострів</MMF.WorldFeatures.Peninsula>
+	<MMF.WorldFeatures.Bay>Затока</MMF.WorldFeatures.Bay>
+	<MMF.WorldFeatures.Lake>Озеро</MMF.WorldFeatures.Lake>
+	<MMF.WorldFeatures.Sea>Море</MMF.WorldFeatures.Sea>
+	<MMF.WorldFeatures.OceanBay>Океанічна затока</MMF.WorldFeatures.OceanBay>
+	<MMF.WorldFeatures.Ocean>Океан</MMF.WorldFeatures.Ocean>
+	<MMF.WorldFeatures.OuterOcean>Зовнішній океан</MMF.WorldFeatures.OuterOcean>
+	<MMF.WorldFeatures.MountainRange>Гірський хребет</MMF.WorldFeatures.MountainRange>
+	<MMF.WorldFeatures.Desert>Пустеля</MMF.WorldFeatures.Desert>
+	<MMF.WorldFeatures.TemperateSwamp>Помірне болото</MMF.WorldFeatures.TemperateSwamp>
+	<MMF.WorldFeatures.TropicalSwamp>Тропічне болото</MMF.WorldFeatures.TropicalSwamp>
+	<MMF.WorldFeatures.ColdBog>Холодне болото</MMF.WorldFeatures.ColdBog>
+	<MMF.WorldFeatures.TemperateForest>Помірний ліс</MMF.WorldFeatures.TemperateForest>
+	<MMF.WorldFeatures.TropicalRainforest>Тропічний ліс</MMF.WorldFeatures.TropicalRainforest>
+	<MMF.WorldFeatures.BorealForest>Тайга</MMF.WorldFeatures.BorealForest>
+	<MMF.WorldFeatures.AridShrubland>Засушливі чагарники</MMF.WorldFeatures.AridShrubland>
+	<MMF.WorldFeatures.IceSheet>Льодовик</MMF.WorldFeatures.IceSheet>
+	<MMF.WorldFeatures.Tundra>Тундра</MMF.WorldFeatures.Tundra>
+</LanguageData>

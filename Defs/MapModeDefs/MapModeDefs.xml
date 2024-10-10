@@ -59,6 +59,18 @@
 	</MapModeFramework.MapModeDef>
 	
 	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>Swampiness</defName>
+		<label>Swampiness</label>
+		<iconPath>UI/MapModes/Swampiness</iconPath>
+	</MapModeFramework.MapModeDef>
+	
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
+		<defName>Pollution</defName>
+		<label>Pollution</label>
+		<iconPath>UI/MapModes/Pollution</iconPath>
+	</MapModeFramework.MapModeDef>
+
+	<MapModeFramework.MapModeDef ParentName="MapMode_Terrain">
 		<mapModeClass>MapModeFramework.MapMode_GrowingPeriod</mapModeClass>
 		<defName>GrowingPeriod</defName>
 		<label>Growing Period</label>
