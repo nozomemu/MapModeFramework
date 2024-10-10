@@ -32,6 +32,14 @@ namespace MapModeFramework
             {
                 return Materials.MatForRainfallOverlay(grid[tile].rainfall);
             }
+            if (def == MapModeFrameworkDefOf.Swampiness)
+            {
+                return Materials.MatForSwampiness(grid[tile].swampiness);
+            }
+            if (def == MapModeFrameworkDefOf.Pollution)
+            {
+                return Materials.MatForPollution(grid[tile].pollution);
+            }
             return base.GetMaterial(tile);
         }
 
@@ -50,6 +58,14 @@ namespace MapModeFramework
             {
                 return grid[tile].rainfall.ToString("F0") + "mm";
             }
+            if (def == MapModeFrameworkDefOf.Swampiness)
+            {
+                return (grid[tile].swampiness * 100).ToString("F0") + "%";
+            }
+            if (def == MapModeFrameworkDefOf.Pollution)
+            {
+                return (grid[tile].pollution * 100).ToString("F0") + "%";
+            }
             return base.GetTileLabel(tile);
         }
 
@@ -67,6 +83,14 @@ namespace MapModeFramework
             if (def == MapModeFrameworkDefOf.Rainfall)
             {
                 return string.Format("{0}: {1}", "Rainfall".Translate(), grid[tile].rainfall.ToString("F0") + "mm");
+            }
+            if (def == MapModeFrameworkDefOf.Swampiness)
+            {
+                return string.Format("{0}: {1}", "Swampiness".Translate(), (grid[tile].swampiness * 100).ToString("F0") + "%");
+            }
+            if (def == MapModeFrameworkDefOf.Pollution)
+            {
+                return string.Format("{0}: {1}", "Pollution".Translate(), (grid[tile].pollution * 100).ToString("F0") + "%");
             }
             return base.GetTooltip(tile);
         }

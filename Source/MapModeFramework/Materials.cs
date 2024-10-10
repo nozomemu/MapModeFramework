@@ -24,7 +24,11 @@ namespace MapModeFramework
         private static Material[] matsElevation;
         private static readonly Color[] ElevationSpectrum;
         private static Material[] matsRainfall;
-        private static readonly Color[] RainfallSpectrum;
+        private static readonly Color[] RainfallSpectrum; 
+        private static Material[] matsSwampiness;
+        private static readonly Color[] SwampinessSpectrum;  
+        private static Material[] matsPollution;
+        private static readonly Color[] PollutionSpectrum;
         private static Material[] matsGrowingPeriod;
         private static readonly Color[] GrowingPeriodSpectrum;
 
@@ -89,6 +93,23 @@ namespace MapModeFramework
                 GenColor.FromBytes(13, 150, 5),
                 GenColor.FromBytes(5, 112, 94)
             };
+            SwampinessSpectrum = new Color[5]
+            {
+                new Color(0.745f, 0.839f, 0.620f, 1f),
+                new Color(0.651f, 0.725f, 0.435f, 1f),
+                new Color(0.510f, 0.549f, 0.318f, 1f),
+                new Color(0.333f, 0.361f, 0.271f, 1f),
+                new Color(0.243f, 0.267f, 0.235f, 1f)
+            };
+            PollutionSpectrum = new Color[5]
+            {
+                new Color(0.800f, 0.725f, 0.810f, 1f),
+                new Color(0.694f, 0.611f, 0.698f, 1f),
+                new Color(0.607f, 0.506f, 0.580f, 1f),
+                new Color(0.478f, 0.365f, 0.447f, 1f),
+                new Color(0.435f, 0.294f, 0.404f, 1f)
+                
+            };
             GrowingPeriodSpectrum = new Color[2]
             {
                 new Color(1f, 1f, 1f, 1f),
@@ -112,6 +133,8 @@ namespace MapModeFramework
             GenerateMats(ref matsTemperature, TemperatureSpectrum, NumMatsPerMode);
             GenerateMats(ref matsElevation, ElevationSpectrum, NumMatsPerMode);
             GenerateMats(ref matsRainfall, RainfallSpectrum, NumMatsPerMode);
+            GenerateMats(ref matsSwampiness, SwampinessSpectrum, NumMatsPerMode);
+            GenerateMats(ref matsPollution, PollutionSpectrum, NumMatsPerMode);
             GenerateMats(ref matsGrowingPeriod, GrowingPeriodSpectrum, numMatsGrowingPeriod);
             GenerateMats(ref matsCommonality, CommonalitySpectrum, NumMatsPerMode);
         }
@@ -151,6 +174,18 @@ namespace MapModeFramework
             return matsRainfall[Mathf.Clamp(value, 0, NumMatsPerMode - 1)];
         }
 
+        public static Material MatForSwampiness(float swampiness)
+        {
+            int value = Mathf.FloorToInt(Mathf.InverseLerp(0f, 100f, swampiness * 100f) * (float)NumMatsPerMode);
+            return matsSwampiness[Mathf.Clamp(value, 0, NumMatsPerMode - 1)];
+        }
+        
+        public static Material MatForPollution(float pollution)
+        {
+            int value = Mathf.FloorToInt(Mathf.InverseLerp(0f, 100f, pollution * 100f) * (float)NumMatsPerMode);
+            return matsPollution[Mathf.Clamp(value, 0, NumMatsPerMode - 1)];
+        }
+        
         public static Material MatForGrowingPeriodOverlay(float growingPeriod)
         {
             int value = Mathf.FloorToInt(growingPeriod / 2f);
