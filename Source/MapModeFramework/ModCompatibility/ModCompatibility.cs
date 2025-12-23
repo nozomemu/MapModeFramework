@@ -57,7 +57,7 @@ namespace MapModeFramework
         public static void ApplyPatches()
         {
             PatchWorldLayer("GeologicalLandforms", "WorldLayer_Landforms", settings => settings.drawHills);
-            PatchWorldLayer("ReGrowthCore", "BiomesKitWorldLayer", settings => settings.drawHills);
+            PatchWorldLayer("ReGrowthCore", "WorldDrawLayer_Beautification", settings => settings.drawHills);
             Assembly explorationMode = assemblies.FirstOrDefault(x => x.GetName().Name.Contains("RimworldExplorationMode"));
             foundRimworldExplorationMode = explorationMode != null;
             if (foundRimworldExplorationMode)
