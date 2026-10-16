@@ -166,7 +166,11 @@ namespace MapModeFramework
 
         public void Reset(bool fullReset = false)
         {
-            currentMapMode = mapModes.First(x => x.def == MapModeFrameworkDefOf.Default);
+            MapMode defaultMapMode = mapModes.FirstOrDefault(x => x.def == MapModeFrameworkDefOf.Default);
+            if (defaultMapMode != null)
+            {
+                currentMapMode = defaultMapMode;
+            }
             drawSettings.Reset();
             regenerateNow = false;
             if (fullReset)
